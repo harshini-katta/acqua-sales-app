@@ -1,19 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { Search } from 'lucide-react';
-import { mockCustomers } from '../mockData';
 
 const CustomersList = () => {
+  const [customers, setCustomers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filteredCustomers, setFilteredCustomers] = useState(mockCustomers);
 
   useEffect(() => {
-    const filtered = mockCustomers.filter(customer =>
-      customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customer.phone.includes(searchTerm) ||
-      customer.email.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredCustomers(filtered);
-  }, [searchTerm]);
+    fetch('https://d28c5r6pnnqv4m.cloudfront.net/fastapi/odoo/contacts/external-contacts')
+      .then((res) => res.json())
+      .then((data) => {
+        // ✅ API returns an array, not { contacts: [...] }
+        setCustomers(Array.isArray(data) ? data : []);
+      })
+      .catch((err) => console.error('Error fetching contacts:', err));
+  }, []);
+
+  const filteredCustomers = customers.filter((customer) =>
+    (customer.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (customer.phone || '').includes(searchTerm) ||
+    (customer.email || '').toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="space-y-4">
@@ -27,13 +33,27 @@ const CustomersList = () => {
           className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
         />
       </div>
-      
+
       <div className="space-y-2">
-        {filteredCustomers.map(customer => (
+        {filteredCustomers.map((customer) => (
           <div key={customer.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
             <h4 className="font-medium text-gray-800">{customer.name}</h4>
-            <p className="text-sm text-gray-600">{customer.phone}</p>
-            <p className="text-sm text-gray-600">{customer.email}</p>
+
+            <p className="text-sm text-gray-600">
+              📞 {customer.phone || 'No phone available'}
+            </p>
+
+            <p className="text-sm text-gray-600">
+              ✉️ {customer.email || 'No email available'}
+            </p>
+
+            {(customer.street || customer.city || customer.country_id) && (
+              <p className="text-sm text-gray-500">
+                {customer.street ? customer.street + ', ' : ''}
+                {customer.city ? customer.city + ', ' : ''}
+                {Array.isArray(customer.country_id) ? customer.country_id[1] : ''}
+              </p>
+            )}
           </div>
         ))}
       </div>
