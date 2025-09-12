@@ -106,8 +106,8 @@ const Dashboard = ({ user, onLogout }) => {
             <div className="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center mb-4 group-hover:bg-red-600 transition">
               <Shield className="w-6 h-6 text-white" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Add Internal User</h3>
-            <p className="text-gray-600 text-sm">Add employees or staff members</p>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">Create Distributors</h3>
+            <p className="text-gray-600 text-sm">Add Distributors & Sales Persons</p>
           </button>
         </div>
       </div>
@@ -134,7 +134,7 @@ const Dashboard = ({ user, onLogout }) => {
       </Modal>
 
       {/* New Modal for Internal Users */}
-      <Modal isOpen={activeModal === 'createInternalUser'} onClose={() => setActiveModal(null)} title="Add Internal User">
+      <Modal isOpen={activeModal === 'createInternalUser'} onClose={() => setActiveModal(null)} title="Add  User">
         <CreateInternalUserForm onClose={() => setActiveModal(null)} onSubmit={handleCreateInternalUser} />
       </Modal>
     </div>
