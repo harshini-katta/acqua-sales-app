@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Package } from 'lucide-react';
+import { BottleWine } from 'lucide-react';
 
 const LoginForm = ({ onLogin }) => {
   const [credentials, setCredentials] = useState({ email: '', password: '' });
@@ -16,7 +16,7 @@ const LoginForm = ({ onLogin }) => {
       try {
         // Call backend login endpoint
         const response = await axios.post(
-          'https://d28c5r6pnnqv4m.cloudfront.net/fastapi/api/login', // <-- Replace with actual backend URL
+          'https://d28c5r6pnnqv4m.cloudfront.net/fastapi/api/login', 
           {
             email: credentials.email,
             password: credentials.password,
@@ -25,9 +25,18 @@ const LoginForm = ({ onLogin }) => {
 
         // Log token in console as requested
         console.log('Token:', response.data);
+         // ✅ Add name fallback with capitalized first letter
+        const nameFromEmail = credentials.email.split('@')[0];
+        const formattedName =
+          nameFromEmail.charAt(0).toUpperCase() + nameFromEmail.slice(1);
 
-        // Call onLogin for now to continue app flow
-        onLogin({ email: credentials.email, role: 'Sales Person' });
+
+        // ✅ Add name fallback from email
+        onLogin({
+          email: credentials.email,
+          name: formattedName,
+          role: 'Sales Person',
+        });
       } catch (err) {
         console.error(err);
         setError('Login failed. Please check your email and password.');
@@ -42,7 +51,7 @@ const LoginForm = ({ onLogin }) => {
       <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Package className="w-8 h-8 text-white" />
+            <BottleWine className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-gray-800 mb-2">AquaSales Login</h1>
           <p className="text-gray-600">Premium Bottled Water Sales</p>

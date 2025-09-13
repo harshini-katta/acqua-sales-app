@@ -6,10 +6,11 @@ const CreateCustomerForm = ({ onClose, onSubmit }) => {
     name: '',
     phone: '',
     email: '',
+    tagline: '', 
     street: '',
     city: '',
     country_id: '',
-    state_id: '',
+    state_id: '', // will hold selected value
     zip: ''
   });
 
@@ -19,9 +20,10 @@ const CreateCustomerForm = ({ onClose, onSubmit }) => {
     if (
       customerData.name &&
       customerData.phone &&
+      // customerData.tagline && 
       customerData.street &&
-      customerData.city &&
-      customerData.country_id &&
+       customerData.city &&
+      // customerData.country_id &&
       customerData.state_id &&
       customerData.zip
     ) {
@@ -32,10 +34,11 @@ const CreateCustomerForm = ({ onClose, onSubmit }) => {
           name: customerData.name,
           email: customerData.email,
           phone: customerData.phone,
+          // tagline: customerData.tagline,
           street: customerData.street,
           city: customerData.city,
-          state_id: parseInt(customerData.state_id, 10),
-          country_id: parseInt(customerData.country_id, 10),
+          state_id: parseInt(customerData.state_id, 10), // dropdown gives string → convert
+          // country_id: parseInt(customerData.country_id, 10),
           zip: customerData.zip
         };
 
@@ -49,7 +52,7 @@ const CreateCustomerForm = ({ onClose, onSubmit }) => {
 
         console.log('Customer created:', response.data);
         alert('Customer created successfully!');
-        onSubmit(response.data); // send API response back
+        onSubmit(response.data);
         onClose();
       } catch (error) {
         console.error('Error creating customer:', error.response ? error.response.data : error.message);
@@ -99,7 +102,7 @@ const CreateCustomerForm = ({ onClose, onSubmit }) => {
         />
       </div>
 
-      {/* Address Fields */}
+      {/* Street */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">Street *</label>
         <input
@@ -111,6 +114,7 @@ const CreateCustomerForm = ({ onClose, onSubmit }) => {
         />
       </div>
 
+      {/* City */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">City *</label>
         <input
@@ -121,8 +125,8 @@ const CreateCustomerForm = ({ onClose, onSubmit }) => {
           required
         />
       </div>
-
-      {/* Country ID */}
+{/* 
+      Country ID
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">Country ID *</label>
         <input
@@ -132,18 +136,21 @@ const CreateCustomerForm = ({ onClose, onSubmit }) => {
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           required
         />
-      </div>
+      </div> */}
 
-      {/* State ID */}
+      {/* State Dropdown */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">State ID *</label>
-        <input
-          type="number"
+        <label className="block text-sm font-medium text-gray-700 mb-2">State *</label>
+        <select
           value={customerData.state_id}
           onChange={(e) => setCustomerData({ ...customerData, state_id: e.target.value })}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           required
-        />
+        >
+          <option value="">Select State</option>
+          <option value="1">Andhra Pradesh</option>
+          <option value="2">Telangana</option>
+        </select>
       </div>
 
       {/* ZIP */}
@@ -157,6 +164,18 @@ const CreateCustomerForm = ({ onClose, onSubmit }) => {
           required
         />
       </div>
+
+      {/* Tagline
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Tagline *</label>
+        <input
+          type="text"
+          value={customerData.tagline}
+          onChange={(e) => setCustomerData({ ...customerData, tagline: e.target.value })}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          required
+        />
+      </div> */}
 
       {/* Buttons */}
       <div className="flex space-x-3">

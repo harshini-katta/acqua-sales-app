@@ -6,7 +6,7 @@ import CreateCustomerForm from './CreateCustomerForm';
 import CreateInternalUserForm from './CreateInternalUserForm'; // NEW
 import OrdersList from './OrdersList';
 import CustomersList from './CustomersList';
-import { Plus, Users, ShoppingCart, User, Shield } from 'lucide-react'; // Shield icon for internal users
+import { Plus, Users, ShoppingCart, User, Package } from 'lucide-react'; // Shield icon for internal users
 
 const Dashboard = ({ user, onLogout }) => {
   const [activeModal, setActiveModal] = useState(null);
@@ -40,8 +40,8 @@ const Dashboard = ({ user, onLogout }) => {
       <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl font-bold mb-4">Sales Management Dashboard</h1>
-            <p className="text-xl text-blue-100">Manage orders and customers for premium bottled water products</p>
+            <h1 className="text-4xl font-bold mb-4">Sales Management Application</h1>
+            <p className="text-xl text-blue-100">Manage orders, customers and users for OceanaPositive premium bottled water products</p>
           </div>
         </div>
       </div>
@@ -104,8 +104,9 @@ const Dashboard = ({ user, onLogout }) => {
             className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition duration-200 border-2 border-transparent hover:border-red-200 group"
           >
             <div className="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center mb-4 group-hover:bg-red-600 transition">
-              <Shield className="w-6 h-6 text-white" />
-            </div>
+  <Package className="w-6 h-6 text-white" />  {/* Changed Shield → Package */}
+</div>
+
             <h3 className="text-lg font-semibold text-gray-800 mb-2">Create Distributors</h3>
             <p className="text-gray-600 text-sm">Add Distributors & Sales Persons</p>
           </button>
