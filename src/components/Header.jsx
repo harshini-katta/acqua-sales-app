@@ -14,18 +14,18 @@ const Header = ({ user, onLogout }) => {
             <h1 className="text-xl font-bold text-gray-800 hidden sm:block">AquaSales</h1>
           </div>
 
-          {/* Center Logo */}
-          <div className="flex-1 flex justify-center">
+          {/* Logo */}
+          <div className="flex-shrink-0 flex justify-center sm:absolute sm:left-1/2 sm:transform sm:-translate-x-1/2">
             <img
               src="assets/OceanPositiveLogo.png"
               alt="Company Logo"
-              className="h-12 sm:h-16 w-auto"
+              className="h-10 sm:h-16 w-auto"
             />
           </div>
 
           {/* Right Section */}
           <div className="flex items-center space-x-2 sm:space-x-4 text-sm sm:text-base">
-            <span className="whitespace-nowrap overflow-hidden text-ellipsis">
+            <span className="truncate max-w-[100px] sm:max-w-none">
               Welcome, {user?.name}
             </span>
             <button
