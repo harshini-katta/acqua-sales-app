@@ -10,7 +10,7 @@ const mockS3Service = {
     // 🎯 STEP 1: ADD YOUR OWN TEMPLATE IMAGES HERE
     const yourTemplateUrls = [
       // Option 1: Host on your server (put images in public/templates/ folder)
-      '/water_bottle.png',
+      '/templates/water_bottle.png',
       
       // Option 2: Base64 data URLs (convert your images to base64)
       // 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBD...',
