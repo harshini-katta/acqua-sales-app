@@ -12,7 +12,7 @@ const App = () => {
 
   const renderDashboard = () => {
     if (!user) return <LoginForm onLogin={handleLogin} />;
-    user.role='customer';
+    //user.role='processor';
     switch (user.role) {
       case 'salesperson':
         return <SalespersonDashboard user={user} onLogout={handleLogout} />;
