@@ -214,7 +214,7 @@ const CreateCustomerForm = ({ onClose, onSubmit }) => {
     address: '',
     category: '',
     templateId: null,
-    logoUrl: ''
+    logoUrl: '',
     street: '',
     city: '',
     country_id: '',
@@ -222,7 +222,7 @@ const CreateCustomerForm = ({ onClose, onSubmit }) => {
     zip: ''
   });
 
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
 
   const businessCategories = [
     { id: 'textile', name: 'Textile/Clothing Shop', icon: '👕' },
@@ -405,14 +405,16 @@ const CreateCustomerForm = ({ onClose, onSubmit }) => {
     }
   };
 
-  const handleFinalSubmit = () => {
-    if (customerData.name && customerData.phone) {
-      const finalData = {
-        ...customerData,
-        previewImage
-      };
-      onSubmit(finalData);
-      onClose();
+ const handleFinalSubmit = () => {
+  if (customerData.name && customerData.phone) {
+    const finalData = {
+      ...customerData,
+      previewImage
+    };
+    onSubmit(finalData);
+    onClose();
+  }
+}; 
   const handleSubmit = async () => {
     if (
       customerData.name &&

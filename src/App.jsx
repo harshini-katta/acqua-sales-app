@@ -16,7 +16,7 @@ const App = () => {
     switch (user.role) {
       case 'salesperson':
         return <SalespersonDashboard user={user} onLogout={handleLogout} />;
-      case 'processor':
+      case 'backoffice':
         return <ProcessorDashboard user={user} onLogout={handleLogout} />;
       case 'customer':
         return <CustomerDashboard user={user} onLogout={handleLogout} />;
