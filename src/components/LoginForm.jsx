@@ -14,29 +14,33 @@ const LoginForm = ({ onLogin }) => {
     if (credentials.email && credentials.password) {
       setLoading(true);
       try {
-        // Call backend login endpoint
         const response = await axios.post(
-          'https://d28c5r6pnnqv4m.cloudfront.net/fastapi/api/login', 
+          'https://d28c5r6pnnqv4m.cloudfront.net/fastapi/api/login',
           {
             email: credentials.email,
             password: credentials.password,
           }
         );
 
-        // Log token in console as requested
-        console.log('Token:', response.data);
-        // ✅ Add name fallback with capitalized first letter
-        const nameFromEmail = credentials.email.split('@')[0];
-        const formattedName =
-        nameFromEmail.charAt(0).toUpperCase() + nameFromEmail.slice(1);
+        const data = response.data;
 
+        // If API returns name, use it; otherwise fallback to email
+        let name = data.name || credentials.email.split('@')[0];
+        name = name.charAt(0).toUpperCase() + name.slice(1);
 
-        // ✅ Add name fallback from email
+        // Get group from response
+        const group = data.group || 'User';
+
+        // Pass all user info to onLogin
         onLogin({
-          email: credentials.email,
-          name: formattedName,
-          role: 'Sales Person',
+          email: data.email,
+          name,
+          group,
+          company: data.company || '',
+          token: data.access_token || '',
+          userId: data.user_id || '',
         });
+
       } catch (err) {
         console.error(err);
         setError('Login failed. Please check your email and password.');

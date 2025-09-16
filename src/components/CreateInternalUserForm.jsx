@@ -6,8 +6,9 @@ const CreateInternalUserForm = ({ onClose }) => {
     name: '',
     email: '',
     password: '',
+    group: 'Salesperson', // static
     role: '',
-    company: '',
+    companyId: '',
   });
   const [loading, setLoading] = useState(false);
 
@@ -19,7 +20,7 @@ const CreateInternalUserForm = ({ onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.email || !formData.password || !formData.role || !formData.company) {
+    if (!formData.name || !formData.email || !formData.password || !formData.role || !formData.companyId) {
       alert('Please fill in all required fields');
       return;
     }
@@ -32,7 +33,7 @@ const CreateInternalUserForm = ({ onClose }) => {
 
       console.log('User created:', response.data);
       alert('Internal user registered successfully!');
-      setFormData({ name: '', email: '', password: '', role: '', company: '' }); // reset
+      setFormData({ name: '', email: '', password: '', group: 'Salesperson', role: '', companyId: '' }); // reset
       onClose();
 
     } catch (error) {
@@ -84,6 +85,18 @@ const CreateInternalUserForm = ({ onClose }) => {
         />
       </div>
 
+      {/* Group (static) */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Group</label>
+        <input
+          type="text"
+          name="group"
+          value={formData.group}
+          readOnly
+          className="mt-1 block w-full p-2 border rounded-md shadow-sm bg-gray-100 cursor-not-allowed"
+        />
+      </div>
+
       {/* Role */}
       <div>
         <label className="block text-sm font-medium text-gray-700">Role *</label>
@@ -101,13 +114,13 @@ const CreateInternalUserForm = ({ onClose }) => {
         </select>
       </div>
 
-      {/* Company */}
+      {/* Company ID */}
       <div>
-        <label className="block text-sm font-medium text-gray-700">Company *</label>
+        <label className="block text-sm font-medium text-gray-700">Company ID *</label>
         <input
           type="text"
-          name="company"
-          value={formData.company}
+          name="companyId"
+          value={formData.companyId}
           onChange={handleChange}
           required
           className="mt-1 block w-full p-2 border rounded-md shadow-sm"

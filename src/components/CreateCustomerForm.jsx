@@ -718,7 +718,7 @@ const CreateCustomerForm = ({ onClose, onSubmit }) => {
 
       {/* Email */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Email*</label>
         <input
           type="email"
           value={customerData.email}
@@ -726,6 +726,17 @@ const CreateCustomerForm = ({ onClose, onSubmit }) => {
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
         />
       </div>
+      {/* Group - Static Portal User */}
+<div>
+  <label className="block text-sm font-medium text-gray-700 mb-2">Group</label>
+  <input
+    type="text"
+    value="Portal User"
+    readOnly
+    className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
+  />
+</div>
+
 
       {/* Address Fields */}
       <div>
@@ -750,7 +761,7 @@ const CreateCustomerForm = ({ onClose, onSubmit }) => {
         />
       </div>
 
-      {/* Country ID */}
+      {/* Country ID
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">Country ID *</label>
         <input
@@ -760,19 +771,23 @@ const CreateCustomerForm = ({ onClose, onSubmit }) => {
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           required
         />
-      </div>
+      </div> */}
 
-      {/* State ID */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">State ID *</label>
-        <input
-          type="number"
-          value={customerData.state_id}
-          onChange={(e) => setCustomerData({ ...customerData, state_id: e.target.value })}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-          required
-        />
-      </div>
+     {/* State */}
+<div>
+  <label className="block text-sm font-medium text-gray-700 mb-2">State *</label>
+  <select
+    value={customerData.state_id}
+    onChange={(e) => setCustomerData({ ...customerData, state_id: e.target.value })}
+    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+    required
+  >
+    <option value="">Select State</option>
+    <option value="andhra">Andhra Pradesh</option>
+    <option value="telangana">Telangana</option>
+  </select>
+</div>
+
 
       {/* ZIP */}
       <div>

@@ -12,9 +12,9 @@ const App = () => {
 
   const renderDashboard = () => {
     if (!user) return <LoginForm onLogin={handleLogin} />;
-    user.role='backoffice';
+    // user.role='salesperson';
     // ✅ don't mutate user.role
-    switch (user.role) {
+    switch (user.group) {
       case 'salesperson':
         return <SalespersonDashboard user={user} onLogout={handleLogout} />;
       case 'backoffice':
