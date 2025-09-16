@@ -86,7 +86,7 @@ const CreateInternalUserForm = ({ onClose }) => {
       </div>
 
       {/* Group (static) */}
-      <div>
+      {/* <div>
         <label className="block text-sm font-medium text-gray-700">Group</label>
         <input
           type="text"
@@ -95,7 +95,7 @@ const CreateInternalUserForm = ({ onClose }) => {
           readOnly
           className="mt-1 block w-full p-2 border rounded-md shadow-sm bg-gray-100 cursor-not-allowed"
         />
-      </div>
+      </div> */}
 
       {/* Role */}
       <div>

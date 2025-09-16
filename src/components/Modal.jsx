@@ -16,7 +16,7 @@ const Modal = ({ isOpen, onClose, title, children, size = 'default' }) => {
       <div className={`bg-white rounded-2xl shadow-xl w-full ${sizeClasses[size]} max-h-[90vh] overflow-hidden flex flex-col`}>
         <div className="p-6 border-b border-gray-200 flex-shrink-0">
           <div className="flex justify-between items-center">
-            {/* <h2 className="text-xl font-bold text-gray-800">{title}</h2> */}
+             <h2 className="text-xl font-bold text-gray-800">{title}</h2> 
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 transition p-1"

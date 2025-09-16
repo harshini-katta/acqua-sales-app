@@ -117,9 +117,11 @@ const CustomerOrderForm = ({ customerId, onClose, onSubmit }) => {
       setLoading(false);
     }
   };
+  
 
   return (
     <div className="space-y-6 max-h-[70vh] overflow-y-auto">
+      
       {/* Product Catalog */}
       <div>
         <h3 className="text-lg font-medium text-gray-800 mb-4">

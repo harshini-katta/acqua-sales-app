@@ -71,7 +71,7 @@ const Header = ({ user, onLogout }) => {
                 </div>
 
                 {/* Create Distributor Button */}
-                {user.role === 'backoffice' && (
+                {user.group === 'backoffice' && (
                   <button
                     onClick={() => setShowModal(true)}
                     className="bg-green-500 text-white px-3 py-1 rounded text-xs hover:bg-green-600 flex items-center space-x-1"
