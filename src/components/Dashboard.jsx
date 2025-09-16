@@ -6,7 +6,8 @@ import CreateCustomerForm from './CreateCustomerForm';
 import CreateInternalUserForm from './CreateInternalUserForm'; // NEW
 import OrdersList from './OrdersList';
 import CustomersList from './CustomersList';
-import { Plus, Users, ShoppingCart, User, Package } from 'lucide-react'; // Shield icon for internal users
+import SummaryDashboard from './summary'; // ✅ Import summary component
+import { Plus, Users, ShoppingCart, User, Package, BarChart3 } from 'lucide-react'; 
 
 const Dashboard = ({ user, onLogout }) => {
   const [activeModal, setActiveModal] = useState(null);
@@ -104,11 +105,22 @@ const Dashboard = ({ user, onLogout }) => {
             className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition duration-200 border-2 border-transparent hover:border-red-200 group"
           >
             <div className="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center mb-4 group-hover:bg-red-600 transition">
-  <Package className="w-6 h-6 text-white" />  {/* Changed Shield → Package */}
-</div>
-
+              <Package className="w-6 h-6 text-white" />
+            </div>
             <h3 className="text-lg font-semibold text-gray-800 mb-2">Create Distributors</h3>
             <p className="text-gray-600 text-sm">Add Distributors & Sales Persons</p>
+          </button>
+
+          {/* ✅ New Summary Dashboard Tile */}
+          <button
+            onClick={() => setActiveModal('viewSummary')}
+            className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition duration-200 border-2 border-transparent hover:border-teal-200 group"
+          >
+            <div className="w-12 h-12 bg-teal-500 rounded-lg flex items-center justify-center mb-4 group-hover:bg-teal-600 transition">
+              <BarChart3 className="w-6 h-6 text-white" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">Summary Dashboard</h3>
+            <p className="text-gray-600 text-sm">View sales, orders and GST overview</p>
           </button>
         </div>
       </div>
@@ -135,8 +147,13 @@ const Dashboard = ({ user, onLogout }) => {
       </Modal>
 
       {/* New Modal for Internal Users */}
-      <Modal isOpen={activeModal === 'createInternalUser'} onClose={() => setActiveModal(null)} title="Add  User">
+      <Modal isOpen={activeModal === 'createInternalUser'} onClose={() => setActiveModal(null)} title="Add User">
         <CreateInternalUserForm onClose={() => setActiveModal(null)} onSubmit={handleCreateInternalUser} />
+      </Modal>
+
+      {/* ✅ New Modal for Summary Dashboard */}
+      <Modal isOpen={activeModal === 'viewSummary'} onClose={() => setActiveModal(null)} title="Summary Dashboard">
+        <SummaryDashboard />
       </Modal>
     </div>
   );
