@@ -1,13 +1,13 @@
 import React from 'react';
-import { Package, LogOut, User, Settings, ShoppingCart } from 'lucide-react';
+import { BottleWine, LogOut, User, Settings, ShoppingCart } from 'lucide-react';
 
 const Header = ({ user, onLogout }) => {
   const getRoleInfo = (role) => {
     switch (role) {
       case 'salesperson':
         return { icon: User, color: 'blue', title: 'Salesperson' };
-      case 'processor':
-        return { icon: Settings, color: 'green', title: 'Order Processor' };
+      case 'backoffice':
+        return { icon: Settings, color: 'green', title: 'Order backoffice' };
       case 'customer':
         return { icon: ShoppingCart, color: 'purple', title: 'Customer' };
       default:
@@ -24,12 +24,21 @@ const Header = ({ user, onLogout }) => {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <div className={`w-8 h-8 bg-${roleInfo.color}-500 rounded-full flex items-center justify-center mr-3`}>
-              <Package className="w-5 h-5 text-white" />
+              <BottleWine className="w-5 h-5 text-white" />
             </div>
             <div>
               <h1 className="text-xl font-bold text-gray-800">AquaSales</h1>
               <p className="text-xs text-gray-500">{roleInfo.title} Portal</p>
             </div>
+          </div>
+
+          {/* Center Logo */}
+          <div className="absolute left-1/2 transform -translate-x-1/2">
+            <img
+              src="src\assets\OceanPositiveLogo.png" // <-- replace with your logo path
+              alt="Logo"
+              className="h-10 w-auto"
+            />
           </div>
           
           <div className="flex items-center space-x-4">
@@ -38,7 +47,7 @@ const Header = ({ user, onLogout }) => {
                 <RoleIcon className={`w-4 h-4 text-${roleInfo.color}-600`} />
               </div>
               <div className="text-right">
-                <p className="text-sm font-medium text-gray-800">{user.name}</p>
+                <p className="text-sm font-medium text-gray-800"> Welcome,{user?.name}</p>
                 <p className={`text-xs text-${roleInfo.color}-600`}>{roleInfo.title}</p>
               </div>
             </div>

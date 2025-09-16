@@ -5,7 +5,7 @@ import OrderProcessingList from './OrderProcessingList';
 import OrderStatusUpdate from './OrderStatusUpdate';
 import { Package, Clock, CheckCircle, Truck, AlertCircle } from 'lucide-react';
 
-const ProcessorDashboard = ({ user, onLogout }) => {
+const BackofficeDashboard = ({ user, onLogout }) => {
   const [activeModal, setActiveModal] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
 
@@ -195,4 +195,4 @@ const ProcessorDashboard = ({ user, onLogout }) => {
   );
 };
 
-export default ProcessorDashboard;
+export default BackofficeDashboard;

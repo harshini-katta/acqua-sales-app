@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import LoginForm from './components/LoginForm';
 import SalespersonDashboard from './components/SalespersonDashboard';
-import ProcessorDashboard from './components/ProcessorDashboard';
+import ProcessorDashboard from './components/ProcessorDashboard'; // ✅ use PascalCase
 import CustomerDashboard from './components/CustomerDashboard';
 
 const App = () => {
@@ -12,7 +12,8 @@ const App = () => {
 
   const renderDashboard = () => {
     if (!user) return <LoginForm onLogin={handleLogin} />;
-    //user.role='processor';
+    user.role='customer';
+    // ✅ don't mutate user.role
     switch (user.role) {
       case 'salesperson':
         return <SalespersonDashboard user={user} onLogout={handleLogout} />;
