@@ -18,7 +18,7 @@ const Header = ({ user, onLogout }) => {
     }
   };
 
-  const roleInfo = getRoleInfo(user.role);
+  const roleInfo = getRoleInfo(user.group);
   const RoleIcon = roleInfo.icon;
 
   return (
