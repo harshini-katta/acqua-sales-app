@@ -116,7 +116,7 @@ const CreateInternalUserForm = ({ onClose }) => {
 
       {/* Company ID */}
       <div>
-        <label className="block text-sm font-medium text-gray-700">Company ID *</label>
+        <label className="block text-sm font-medium text-gray-700">Distributor ID *</label>
         <input
           type="text"
           name="companyId"
