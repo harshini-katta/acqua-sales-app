@@ -7,6 +7,7 @@ const OrderStatusUpdate = ({ orderId, onClose, onSubmit }) => {
   const [deliveryNote, setDeliveryNote] = useState('');
   const [estimatedDelivery, setEstimatedDelivery] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (orderId) {
@@ -15,56 +16,73 @@ const OrderStatusUpdate = ({ orderId, onClose, onSubmit }) => {
   }, [orderId]);
 
   const fetchOrderDetails = async () => {
+    setLoading(true);
+    setError(null);
     try {
-      // Mock order data - replace with actual API call
-      const mockOrder = {
-        id: orderId,
-        name: `SO00${orderId}`,
-        customer: 'John Doe',
-        amount: 240.50,
-        currentStatus: 'sale',
-        deliveryNotes: '2024-01-15 10:30 - Order confirmed\n2024-01-15 14:00 - Processing started'
-      };
-      setOrderData(mockOrder);
-      setNewStatus(mockOrder.currentStatus);
+      const token = 'YOUR_AUTH_TOKEN_HERE'; // Replace with a dynamic way to get the token
+      // Corrected URL to match the API endpoint
+      const response = await fetch(`https://d28c5r6pnnqv4m.cloudfront.net/fastapi/odoo/order-management/orders/${orderId}/details`, {
+        headers: {
+          'accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch order details.');
+      }
+
+      const data = await response.json();
+      setOrderData({
+        id: data.id,
+        name: data.name,
+        customer: data.partner_id[1], // Assuming partner_id[1] is the customer name
+        amount: data.amount_total,
+        currentStatus: data.state,
+        deliveryNotes: data.note ? data.note.replace(/<[^>]*>?/gm, '') : 'No notes available.' // Clean up HTML tags if present
+      });
+      setNewStatus(data.state);
     } catch (error) {
       console.error('Error fetching order details:', error);
+      setError('Could not load order details. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
   const statusOptions = [
-    { 
-      value: 'draft', 
-      label: 'Draft', 
-      icon: Clock, 
+    {
+      value: 'draft',
+      label: 'Draft',
+      icon: Clock,
       color: 'gray',
       description: 'Order created but not confirmed'
     },
-    { 
-      value: 'sent', 
-      label: 'Quotation Sent', 
-      icon: AlertCircle, 
+    {
+      value: 'sent',
+      label: 'Quotation Sent',
+      icon: AlertCircle,
       color: 'yellow',
       description: 'Quotation sent to customer'
     },
-    { 
-      value: 'sale', 
-      label: 'Confirmed', 
-      icon: Package, 
+    {
+      value: 'sale',
+      label: 'Confirmed',
+      icon: Package,
       color: 'blue',
       description: 'Order confirmed and being processed'
     },
-    { 
-      value: 'shipped', 
-      label: 'Shipped', 
-      icon: Truck, 
+    {
+      value: 'shipped',
+      label: 'Shipped',
+      icon: Truck,
       color: 'orange',
       description: 'Order shipped and in transit'
     },
-    { 
-      value: 'delivered', 
-      label: 'Delivered', 
-      icon: CheckCircle, 
+    {
+      value: 'delivered',
+      label: 'Delivered',
+      icon: CheckCircle,
       color: 'green',
       description: 'Order successfully delivered'
     }
@@ -77,7 +95,7 @@ const OrderStatusUpdate = ({ orderId, onClose, onSubmit }) => {
     }
 
     setLoading(true);
-    
+
     try {
       const timestamp = new Date().toLocaleString();
       const updateData = {
@@ -100,13 +118,25 @@ const OrderStatusUpdate = ({ orderId, onClose, onSubmit }) => {
     return option ? option.color : 'gray';
   };
 
-  if (!orderData) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         <span className="ml-2 text-gray-600">Loading order details...</span>
       </div>
     );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-8 text-red-500">
+        <p>{error}</p>
+      </div>
+    );
+  }
+
+  if (!orderData) {
+    return null;
   }
 
   return (
@@ -176,14 +206,14 @@ const OrderStatusUpdate = ({ orderId, onClose, onSubmit }) => {
               >
                 <div className="flex items-center space-x-3">
                   <Icon className={`w-5 h-5 ${
-                    newStatus === option.value 
-                      ? `text-${option.color}-600` 
+                    newStatus === option.value
+                      ? `text-${option.color}-600`
                       : 'text-gray-400'
                   }`} />
                   <div className="flex-1">
                     <p className={`font-medium ${
-                      newStatus === option.value 
-                        ? `text-${option.color}-700` 
+                      newStatus === option.value
+                        ? `text-${option.color}-700`
                         : 'text-gray-600'
                     }`}>
                       {option.label}
@@ -211,21 +241,6 @@ const OrderStatusUpdate = ({ orderId, onClose, onSubmit }) => {
           required
         />
       </div>
-
-      {/* Estimated Delivery (for shipped status) */}
-      {newStatus === 'shipped' && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Estimated Delivery Date
-          </label>
-          <input
-            type="datetime-local"
-            value={estimatedDelivery}
-            onChange={(e) => setEstimatedDelivery(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
-      )}
 
       {/* Action Buttons */}
       <div className="flex space-x-3 pt-4">
