@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Search } from 'lucide-react';
+import { fastapi_url } from '../App';
 
 const CustomersList = () => {
   const [customers, setCustomers] = useState([]);
