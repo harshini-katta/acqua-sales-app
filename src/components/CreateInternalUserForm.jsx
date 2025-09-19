@@ -8,7 +8,7 @@ const CreateInternalUserForm = ({ onClose }) => {
     password: '',
     group: 'Salesperson', // static
     role: '',
-    companyId: '',
+    company: '',
   });
   const [loading, setLoading] = useState(false);
 
@@ -20,7 +20,7 @@ const CreateInternalUserForm = ({ onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.email || !formData.password || !formData.role || !formData.companyId) {
+    if (!formData.name || !formData.email || !formData.password || !formData.role || !formData.company) {
       alert('Please fill in all required fields');
       return;
     }
@@ -28,17 +28,36 @@ const CreateInternalUserForm = ({ onClose }) => {
     try {
       setLoading(true);
 
-      // 🔹 API call to register internal user
-      const response = await axios.post('https://d28c5r6pnnqv4m.cloudfront.net/fastapi/api/register', formData);
+      // 🔹 API call with headers (Content-Type + optional Authorization)
+      const token = ""; // put admin token here if backend requires it
+
+      const response = await axios.post(
+        'https://d28c5r6pnnqv4m.cloudfront.net/fastapi/api/register',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+        }
+      );
 
       console.log('User created:', response.data);
       alert('Internal user registered successfully!');
-      setFormData({ name: '', email: '', password: '', group: 'Salesperson', role: '', companyId: '' }); // reset
+      setFormData({ name: '', email: '', password: '', group: 'Salesperson', role: '', company: '' }); // reset
       onClose();
 
     } catch (error) {
-      console.error('Error creating user:', error);
-      alert('Failed to register internal user. Please try again.');
+      if (error.response) {
+        console.error('Response error:', error.response.data);
+        alert(`Failed to register: ${error.response.data.detail || JSON.stringify(error.response.data)}`);
+      } else if (error.request) {
+        console.error('No response from server:', error.request);
+        alert('No response from server. Check if API is running.');
+      } else {
+        console.error('Error creating user:', error.message);
+        alert('Unexpected error. Check console for details.');
+      }
     } finally {
       setLoading(false);
     }
@@ -85,18 +104,6 @@ const CreateInternalUserForm = ({ onClose }) => {
         />
       </div>
 
-      {/* Group (static) */}
-      {/* <div>
-        <label className="block text-sm font-medium text-gray-700">Group</label>
-        <input
-          type="text"
-          name="group"
-          value={formData.group}
-          readOnly
-          className="mt-1 block w-full p-2 border rounded-md shadow-sm bg-gray-100 cursor-not-allowed"
-        />
-      </div> */}
-
       {/* Role */}
       <div>
         <label className="block text-sm font-medium text-gray-700">Role *</label>
@@ -114,13 +121,13 @@ const CreateInternalUserForm = ({ onClose }) => {
         </select>
       </div>
 
-      {/* Company ID */}
+      {/* Company */}
       <div>
-        <label className="block text-sm font-medium text-gray-700">Distributor ID *</label>
+        <label className="block text-sm font-medium text-gray-700">Company *</label>
         <input
           type="text"
-          name="companyId"
-          value={formData.companyId}
+          name="company"
+          value={formData.company}
           onChange={handleChange}
           required
           className="mt-1 block w-full p-2 border rounded-md shadow-sm"
