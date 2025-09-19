@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { BottleWine } from 'lucide-react';
+import { BottleWine, Eye, EyeOff } from 'lucide-react';
 
 const LoginForm = ({ onLogin }) => {
   const [credentials, setCredentials] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // 👈 state for toggling password
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,15 +24,10 @@ const LoginForm = ({ onLogin }) => {
         );
 
         const data = response.data;
-
-        // If API returns name, use it; otherwise fallback to email
         let name = data.name || credentials.email.split('@')[0];
         name = name.charAt(0).toUpperCase() + name.slice(1);
-
-        // Get group from response
         const group = data.group || 'User';
 
-        // Pass all user info to onLogin
         onLogin({
           email: data.email,
           name,
@@ -74,17 +70,24 @@ const LoginForm = ({ onLogin }) => {
               required
             />
           </div>
-          <div>
+          <div className="relative">
             <input
-              type="password"
+              type={showPassword ? 'text' : 'password'} // 👈 toggle type
               placeholder="Password"
               value={credentials.password}
               onChange={(e) =>
                 setCredentials({ ...credentials, password: e.target.value })
               }
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10"
               required
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)} // 👈 toggle handler
+              className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
           </div>
           {error && <p className="text-red-500 text-sm">{error}</p>}
           <button
