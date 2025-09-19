@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import Header from './Header';
 import Modal from './Modal';
 import CreateOrderForm from './CreateOrderForm';
@@ -7,11 +6,34 @@ import CreateCustomerForm from './CreateCustomerForm';
 import OrdersList from './OrdersList';
 import CustomersList from './CustomersList';
 import { Plus, Users, ShoppingCart, User, TrendingUp } from 'lucide-react';
+import axios from 'axios';
 
 const SalespersonDashboard = ({ user, onLogout }) => {
   const [activeModal, setActiveModal] = useState(null);
-  const [totalOrders, setTotalOrders] = useState(0); // total orders state
-  const [revenue, setRevenue] = useState(0); // revenue state
+
+  // 🔹 API-driven values
+  const [totalOrders, setTotalOrders] = useState(0);
+  const [revenue, setRevenue] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch total orders and revenue from backend
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await axios.get('https://d28c5r6pnnqv4m.cloudfront.net/fastapi/odoo/order-management/orders/customer/revenue');
+        if (response.data) {
+          setTotalOrders(response.data.total_orders || 0);
+          setRevenue(response.data.revenue || 0);
+        }
+      } catch (error) {
+        console.error('Error fetching dashboard stats:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   const handleCreateOrder = (orderData) => {
     console.log('Creating order:', orderData);
@@ -23,41 +45,6 @@ const SalespersonDashboard = ({ user, onLogout }) => {
     alert('Customer created successfully!');
   };
 
-  // Fetch total orders and revenue from API
-  useEffect(() => {
-    const fetchCustomerRevenue = async () => {
-      try {
-        const token = "YOUR_TOKEN_HERE"; // replace with your token if needed
-        const response = await fetch(
-          "http://d28c5r6pnnqv4m.cloudfront.net/fastapi/orders/customer/revenue",
-          {
-            method: "GET",
-            headers: {
-              "Accept": "application/json",
-              "Authorization": `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch revenue");
-        }
-
-        const data = await response.json();
-        console.log("Revenue data:", data);
-
-        // Assuming the API returns a single object like this:
-        // { customer_id: 26, customer_name: "sita", total_revenue: 23000, total_orders: 3 }
-        setTotalOrders(data.total_orders);
-        setRevenue(data.total_revenue);
-      } catch (error) {
-        console.error("Error fetching revenue:", error);
-      }
-    };
-
-    fetchCustomerRevenue();
-  }, []);
-
   return (
     <div className="min-h-screen bg-gray-50">
       <Header user={user} onLogout={onLogout} />
@@ -66,12 +53,15 @@ const SalespersonDashboard = ({ user, onLogout }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl font-bold mb-4">Distributor Dashboard</h1>
-            <p className="text-xl text-blue-100">Manage orders and customers for premium bottled water products</p>
+            <p className="text-xl text-blue-100">
+              Manage orders and customers for premium bottled water products
+            </p>
           </div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Action buttons */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <button
             onClick={() => setActiveModal('createOrder')}
@@ -124,7 +114,9 @@ const SalespersonDashboard = ({ user, onLogout }) => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Orders</p>
-                <p className="text-3xl font-bold text-gray-900">{totalOrders}</p>
+                <p className="text-3xl font-bold text-gray-900">
+                  {loading ? '...' : totalOrders}
+                </p>
               </div>
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                 <ShoppingCart className="w-6 h-6 text-blue-600" />
@@ -148,7 +140,9 @@ const SalespersonDashboard = ({ user, onLogout }) => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Revenue</p>
-                <p className="text-3xl font-bold text-gray-900">₹{revenue}</p>
+                <p className="text-3xl font-bold text-gray-900">
+                  {loading ? '...' : `₹${revenue}`}
+                </p>
               </div>
               <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
                 <TrendingUp className="w-6 h-6 text-orange-600" />
@@ -159,19 +153,35 @@ const SalespersonDashboard = ({ user, onLogout }) => {
       </div>
 
       {/* Modals */}
-      <Modal isOpen={activeModal === 'createOrder'} onClose={() => setActiveModal(null)} title="Create New Order">
+      <Modal
+        isOpen={activeModal === 'createOrder'}
+        onClose={() => setActiveModal(null)}
+        title="Create New Order"
+      >
         <CreateOrderForm onClose={() => setActiveModal(null)} onSubmit={handleCreateOrder} />
       </Modal>
 
-      <Modal isOpen={activeModal === 'viewOrders'} onClose={() => setActiveModal(null)} title="Orders">
+      <Modal
+        isOpen={activeModal === 'viewOrders'}
+        onClose={() => setActiveModal(null)}
+        title="Orders"
+      >
         <OrdersList />
       </Modal>
 
-      <Modal isOpen={activeModal === 'createCustomer'} onClose={() => setActiveModal(null)} title="Create New Customer">
+      <Modal
+        isOpen={activeModal === 'createCustomer'}
+        onClose={() => setActiveModal(null)}
+        title="Create New Customer"
+      >
         <CreateCustomerForm onClose={() => setActiveModal(null)} onSubmit={handleCreateCustomer} />
       </Modal>
 
-      <Modal isOpen={activeModal === 'viewCustomers'} onClose={() => setActiveModal(null)} title="Customers">
+      <Modal
+        isOpen={activeModal === 'viewCustomers'}
+        onClose={() => setActiveModal(null)}
+        title="Customers"
+      >
         <CustomersList />
       </Modal>
     </div>
