@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Search } from 'lucide-react';
+import { fastapi_url } from '../App';
 
 const CustomersList = () => {
   const [customers, setCustomers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    fetch('https://d28c5r6pnnqv4m.cloudfront.net/fastapi/odoo/contacts/external-contacts')
+    fetch(fastapi_url+'/fastapi/odoo/contacts/external-contacts')
       .then((res) => res.json())
       .then((data) => {
         // ✅ API returns an array, not { contacts: [...] }

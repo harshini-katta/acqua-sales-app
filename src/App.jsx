@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import LoginForm from './components/LoginForm';
 import SalespersonDashboard from './components/SalespersonDashboard';
-import ProcessorDashboard from './components/ProcessorDashboard';
+import ProcessorDashboard from './components/ProcessorDashboard'; // ✅ use PascalCase
 import CustomerDashboard from './components/CustomerDashboard';
 
+export const fastapi_url="https://d28c5r6pnnqv4m.cloudfront.net"
 const App = () => {
   const [user, setUser] = useState(null);
 
@@ -12,11 +13,12 @@ const App = () => {
 
   const renderDashboard = () => {
     if (!user) return <LoginForm onLogin={handleLogin} />;
-    //user.role='processor';
-    switch (user.role) {
+    //user.group='backoffice';
+    // ✅ don't mutate user.role
+    switch (user.group) {
       case 'salesperson':
         return <SalespersonDashboard user={user} onLogout={handleLogout} />;
-      case 'processor':
+      case 'backoffice':
         return <ProcessorDashboard user={user} onLogout={handleLogout} />;
       case 'customer':
         return <CustomerDashboard user={user} onLogout={handleLogout} />;

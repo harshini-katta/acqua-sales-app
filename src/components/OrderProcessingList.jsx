@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Search, Package, Clock, Truck, CheckCircle, Edit3 } from 'lucide-react';
+import { fastapi_url } from '../App';
 
 const OrderProcessingList = ({ status, onUpdateOrder }) => {
   const [orders, setOrders] = useState([]);
@@ -13,7 +14,7 @@ const OrderProcessingList = ({ status, onUpdateOrder }) => {
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const response = await fetch('https://d28c5r6pnnqv4m.cloudfront.net/fastapi/odoo/orders');
+      const response = await fetch(fastapi_url+'/fastapi/odoo/orders');
       const data = await response.json();
       
       let filteredOrders = data.orders || [];

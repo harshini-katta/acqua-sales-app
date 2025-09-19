@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { ChevronLeft, Upload, Check, X, Grid, List } from 'lucide-react';
+import { fastapi_url } from '../App';
 
 // Mock AWS S3 service - replace with your actual AWS integration  
 const mockS3Service = {
@@ -214,8 +215,15 @@ const CreateCustomerForm = ({ onClose, onSubmit }) => {
     address: '',
     category: '',
     templateId: null,
-    logoUrl: ''
+    logoUrl: '',
+    street: '',
+    city: '',
+    country_id: '',
+    state_id: '',
+    zip: ''
   });
+
+  // const [loading, setLoading] = useState(false);
 
   const businessCategories = [
     { id: 'textile', name: 'Textile/Clothing Shop', icon: '👕' },
@@ -398,14 +406,60 @@ const CreateCustomerForm = ({ onClose, onSubmit }) => {
     }
   };
 
-  const handleFinalSubmit = () => {
-    if (customerData.name && customerData.phone) {
-      const finalData = {
-        ...customerData,
-        previewImage
-      };
-      onSubmit(finalData);
-      onClose();
+ const handleFinalSubmit = () => {
+  if (customerData.name && customerData.phone) {
+    const finalData = {
+      ...customerData,
+      previewImage
+    };
+    onSubmit(finalData);
+    onClose();
+  }
+}; 
+  const handleSubmit = async () => {
+    if (
+      customerData.name &&
+      customerData.phone &&
+      customerData.street &&
+      customerData.city &&
+      customerData.country_id &&
+      customerData.state_id &&
+      customerData.zip
+    ) {
+      try {
+        setLoading(true);
+
+        const requestBody = {
+          name: customerData.name,
+          email: customerData.email,
+          phone: customerData.phone,
+          street: customerData.street,
+          city: customerData.city,
+          state_id: parseInt(customerData.state_id, 10),
+          country_id: parseInt(customerData.country_id, 10),
+          zip: customerData.zip
+        };
+
+        const response = await axios.post(
+          fastapi_url+'/fastapi/odoo/contacts/',
+          requestBody,
+          {
+            headers: { 'Content-Type': 'application/json' }
+          }
+        );
+
+        console.log('Customer created:', response.data);
+        alert('Customer created successfully!');
+        onSubmit(response.data); // send API response back
+        onClose();
+      } catch (error) {
+        console.error('Error creating customer:', error.response ? error.response.data : error.message);
+        alert('Failed to create customer. See console for details.');
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      alert('Please fill all required fields (*)');
     }
   };
 
@@ -645,44 +699,116 @@ const CreateCustomerForm = ({ onClose, onSubmit }) => {
         <input
           type="text"
           value={customerData.name}
-          onChange={(e) => setCustomerData({...customerData, name: e.target.value})}
+          onChange={(e) => setCustomerData({ ...customerData, name: e.target.value })}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           required
         />
       </div>
+
+      {/* Phone */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">Phone *</label>
         <input
           type="tel"
           value={customerData.phone}
-          onChange={(e) => setCustomerData({...customerData, phone: e.target.value})}
+          onChange={(e) => setCustomerData({ ...customerData, phone: e.target.value })}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           required
         />
       </div>
+
+      {/* Email */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
         <input
           type="email"
           value={customerData.email}
-          onChange={(e) => setCustomerData({...customerData, email: e.target.value})}
+          onChange={(e) => setCustomerData({ ...customerData, email: e.target.value })}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
         />
       </div>
+      {/* Group - Static Portal User
+<div>
+  <label className="block text-sm font-medium text-gray-700 mb-2">Group</label>
+  <input
+    type="text"
+    value="Portal User"
+    readOnly
+    className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
+  />
+</div> */}
+
+
+      {/* Address Fields */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Address</label>
-        <textarea
-          value={customerData.address}
-          onChange={(e) => setCustomerData({...customerData, address: e.target.value})}
+        <label className="block text-sm font-medium text-gray-700 mb-2">Street *</label>
+        <input
+          type="text"
+          value={customerData.street}
+          onChange={(e) => setCustomerData({ ...customerData, street: e.target.value })}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-          rows="3"
+          required
         />
       </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">City *</label>
+        <input
+          type="text"
+          value={customerData.city}
+          onChange={(e) => setCustomerData({ ...customerData, city: e.target.value })}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          required
+        />
+      </div>
+
+      {/* Country ID
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Country ID *</label>
+        <input
+          type="number"
+          value={customerData.country_id}
+          onChange={(e) => setCustomerData({ ...customerData, country_id: e.target.value })}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          required
+        />
+      </div> */}
+
+     {/* State */}
+<div>
+  <label className="block text-sm font-medium text-gray-700 mb-2">State *</label>
+  <select
+    value={customerData.state_id}
+    onChange={(e) => setCustomerData({ ...customerData, state_id: e.target.value })}
+    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+    required
+  >
+    <option value="">Select State</option>
+    <option value="andhra">Andhra Pradesh</option>
+    <option value="telangana">Telangana</option>
+  </select>
+</div>
+
+
+      {/* ZIP */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">PostalNumber *</label>
+        <input
+          type="text"
+          value={customerData.zip}
+          onChange={(e) => setCustomerData({ ...customerData, zip: e.target.value })}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          required
+        />
+      </div>
+
+      {/* Buttons */}
       <div className="flex space-x-3">
         <button
           type="button"
           onClick={onClose}
           className="flex-1 bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600"
+          disabled={loading}
         >
           Cancel
         </button>
@@ -692,7 +818,7 @@ const CreateCustomerForm = ({ onClose, onSubmit }) => {
           disabled={!customerData.name || !customerData.phone}
           className="flex-1 bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 disabled:opacity-50"
         >
-          Create Customer
+          {loading ? 'Creating...' : 'Create Customer'}
         </button>
       </div>
     </div>

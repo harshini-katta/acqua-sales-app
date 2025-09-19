@@ -4,8 +4,9 @@ import Modal from './Modal';
 import OrderProcessingList from './OrderProcessingList';
 import OrderStatusUpdate from './OrderStatusUpdate';
 import { Package, Clock, CheckCircle, Truck, AlertCircle } from 'lucide-react';
+import { fastapi_url } from '../App';
 
-const ProcessorDashboard = ({ user, onLogout }) => {
+const BackofficeDashboard = ({ user, onLogout }) => {
   const [activeModal, setActiveModal] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
 
@@ -18,13 +19,14 @@ const ProcessorDashboard = ({ user, onLogout }) => {
   const handleOrderUpdate = async (orderData) => {
     try {
       // API call to update order status and add delivery notes
-      const response = await fetch(`https://d28c5r6pnnqv4m.cloudfront.net/fastapi/odoo/orders/${selectedOrder}/status`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(orderData)
-      });
+     const response = await fetch(`${fastapi_url}/fastapi/odoo/orders/${selectedOrder}/status`, {
+  method: 'PUT',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(orderData),
+});
+
       
       if (response.ok) {
         alert('Order updated successfully!');
@@ -195,4 +197,4 @@ const ProcessorDashboard = ({ user, onLogout }) => {
   );
 };
 
-export default ProcessorDashboard;
+export default BackofficeDashboard;

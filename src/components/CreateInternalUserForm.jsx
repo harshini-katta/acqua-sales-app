@@ -1,0 +1,159 @@
+import React, { useState } from 'react';
+import axios from 'axios';
+import { fastapi_url } from '../App';
+
+const CreateInternalUserForm = ({ onClose }) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    group: 'Salesperson', // static
+    role: '',
+    company: '',
+  });
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!formData.name || !formData.email || !formData.password || !formData.role || !formData.company) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      // 🔹 API call with headers (Content-Type + optional Authorization)
+      const token = ""; // put admin token here if backend requires it
+
+      const response = await axios.post(
+        fastapi_url+'/fastapi/api/register',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+        }
+      );
+
+      console.log('User created:', response.data);
+      alert('Internal user registered successfully!');
+      setFormData({ name: '', email: '', password: '', group: 'Salesperson', role: '', company: '' }); // reset
+      onClose();
+
+    } catch (error) {
+      if (error.response) {
+        console.error('Response error:', error.response.data);
+        alert(`Failed to register: ${error.response.data.detail || JSON.stringify(error.response.data)}`);
+      } else if (error.request) {
+        console.error('No response from server:', error.request);
+        alert('No response from server. Check if API is running.');
+      } else {
+        console.error('Error creating user:', error.message);
+        alert('Unexpected error. Check console for details.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Name */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Full Name *</label>
+        <input
+          type="text"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          required
+          className="mt-1 block w-full p-2 border rounded-md shadow-sm"
+        />
+      </div>
+
+      {/* Email */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Email *</label>
+        <input
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          required
+          className="mt-1 block w-full p-2 border rounded-md shadow-sm"
+        />
+      </div>
+
+      {/* Password */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Password *</label>
+        <input
+          type="password"
+          name="password"
+          value={formData.password}
+          onChange={handleChange}
+          required
+          className="mt-1 block w-full p-2 border rounded-md shadow-sm"
+        />
+      </div>
+
+      {/* Role */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Role *</label>
+        <select
+          name="role"
+          value={formData.role}
+          onChange={handleChange}
+          required
+          className="mt-1 block w-full p-2 border rounded-md shadow-sm"
+        >
+          <option value="">Select Role</option>
+          <option value="internal">Admin</option>
+          <option value="portal">Support</option>
+          <option value="public">Manager</option>
+        </select>
+      </div>
+
+      {/* Company */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Company *</label>
+        <input
+          type="text"
+          name="company"
+          value={formData.company}
+          onChange={handleChange}
+          required
+          className="mt-1 block w-full p-2 border rounded-md shadow-sm"
+        />
+      </div>
+
+      {/* Buttons */}
+      <div className="flex justify-end space-x-3">
+        <button
+          type="button"
+          onClick={onClose}
+          className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          disabled={loading}
+          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+        >
+          {loading ? 'Registering...' : 'Register User'}
+        </button>
+      </div>
+    </form>
+  );
+};
+
+export default CreateInternalUserForm;
