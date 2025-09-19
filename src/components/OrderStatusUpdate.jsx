@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Package, Truck, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { fastapi_url } from '../App';
 
 const OrderStatusUpdate = ({ orderId, onClose, onSubmit }) => {
   const [orderData, setOrderData] = useState(null);
@@ -21,12 +22,13 @@ const OrderStatusUpdate = ({ orderId, onClose, onSubmit }) => {
     try {
       const token = 'YOUR_AUTH_TOKEN_HERE'; // Replace with a dynamic way to get the token
       // Corrected URL to match the API endpoint
-      const response = await fetch(`https://d28c5r6pnnqv4m.cloudfront.net/fastapi/odoo/order-management/orders/${orderId}/details`, {
-        headers: {
-          'accept': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const response = await fetch(`${fastapi_url}/fastapi/odoo/order-management/orders/${orderId}/details`, {
+  headers: {
+    'accept': 'application/json',
+    'Authorization': `Bearer ${token}`
+  }
+});
+
 
       if (!response.ok) {
         throw new Error('Failed to fetch order details.');

@@ -4,6 +4,7 @@ import SalespersonDashboard from './components/SalespersonDashboard';
 import ProcessorDashboard from './components/ProcessorDashboard'; // ✅ use PascalCase
 import CustomerDashboard from './components/CustomerDashboard';
 
+export const fastapi_url="https://d28c5r6pnnqv4m.cloudfront.net"
 const App = () => {
   const [user, setUser] = useState(null);
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { BottleWine, Eye, EyeOff } from 'lucide-react';
+import { fastapi_url } from '../App';
 
 const LoginForm = ({ onLogin }) => {
   const [credentials, setCredentials] = useState({ email: '', password: '' });
@@ -16,7 +17,7 @@ const LoginForm = ({ onLogin }) => {
       setLoading(true);
       try {
         const response = await axios.post(
-          'https://d28c5r6pnnqv4m.cloudfront.net/fastapi/api/login',
+          fastapi_url+'/fastapi/api/login',
           {
             email: credentials.email,
             password: credentials.password,

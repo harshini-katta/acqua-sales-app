@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Plus, Minus, ShoppingCart } from 'lucide-react';
+import { fastapi_url } from '../App';
 
 const CustomerOrderForm = ({ customerId, onClose, onSubmit }) => {
   const [orderItems, setOrderItems] = useState([]);
@@ -22,7 +23,7 @@ const CustomerOrderForm = ({ customerId, onClose, onSubmit }) => {
     const interval = setInterval(async () => {
       try {
         const res = await axios.get(
-          'https://d28c5r6pnnqv4m.cloudfront.net/fastapi/odoo/products',
+          fastapi_url+'/fastapi/odoo/products',
           { params: { skip: 0, limit: 20 } }
         );
         const data = res.data;

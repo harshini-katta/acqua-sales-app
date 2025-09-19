@@ -7,6 +7,7 @@ import OrdersList from './OrdersList';
 import CustomersList from './CustomersList';
 import { Plus, Users, ShoppingCart, User, TrendingUp } from 'lucide-react';
 import axios from 'axios';
+import { fastapi_url } from '../App';
 
 const SalespersonDashboard = ({ user, onLogout }) => {
   const [activeModal, setActiveModal] = useState(null);
@@ -20,7 +21,7 @@ const SalespersonDashboard = ({ user, onLogout }) => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await axios.get('https://d28c5r6pnnqv4m.cloudfront.net/fastapi/odoo/order-management/orders/customer/revenue');
+        const response = await axios.get(fastapi_url+'/fastapi/odoo/order-management/orders/customer/revenue');
         if (response.data) {
           setTotalOrders(response.data.total_orders || 0);
           setRevenue(response.data.revenue || 0);

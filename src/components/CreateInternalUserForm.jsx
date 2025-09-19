@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { fastapi_url } from '../App';
 
 const CreateInternalUserForm = ({ onClose }) => {
   const [formData, setFormData] = useState({
@@ -32,7 +33,7 @@ const CreateInternalUserForm = ({ onClose }) => {
       const token = ""; // put admin token here if backend requires it
 
       const response = await axios.post(
-        'https://d28c5r6pnnqv4m.cloudfront.net/fastapi/api/register',
+        fastapi_url+'/fastapi/api/register',
         formData,
         {
           headers: {

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { ChevronLeft, Upload, Check, X, Grid, List } from 'lucide-react';
+import { fastapi_url } from '../App';
 
 // Mock AWS S3 service - replace with your actual AWS integration  
 const mockS3Service = {
@@ -440,7 +441,7 @@ const CreateCustomerForm = ({ onClose, onSubmit }) => {
         };
 
         const response = await axios.post(
-          'https://d28c5r6pnnqv4m.cloudfront.net/fastapi/odoo/contacts/',
+          fastapi_url+'/fastapi/odoo/contacts/',
           requestBody,
           {
             headers: { 'Content-Type': 'application/json' }
@@ -718,7 +719,7 @@ const CreateCustomerForm = ({ onClose, onSubmit }) => {
 
       {/* Email */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Email*</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
         <input
           type="email"
           value={customerData.email}

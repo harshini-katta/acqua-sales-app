@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Search } from 'lucide-react';
+import { fastapi_url } from '../App';
 
 const OrdersList = () => {
   const [orders, setOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    fetch('https://d28c5r6pnnqv4m.cloudfront.net/fastapi/odoo/orders')
+    fetch(fastapi_url+'/fastapi/odoo/orders')
       .then((res) => res.json())
       .then((data) => {
         setOrders(data.orders || []);

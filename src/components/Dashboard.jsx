@@ -14,17 +14,17 @@ const Dashboard = ({ user, onLogout }) => {
 
   const handleCreateOrder = (orderData) => {
     console.log('Creating order:', orderData);
-    alert('Order created successfully!');
+    //alert('Order created successfully!');
   };
 
   const handleCreateCustomer = (customerData) => {
     console.log('Creating customer:', customerData);
-    alert('Customer created successfully!');
+    //alert('Customer created successfully!');
   };
 
   const handleCreateInternalUser = (internalUserData) => {
     console.log('Creating internal user:', internalUserData);
-    alert('Internal user created successfully!');
+    //alert('Internal user created successfully!');
   };
 
   const openCreateOrderModal = () => {
