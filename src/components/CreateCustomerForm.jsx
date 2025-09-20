@@ -557,9 +557,9 @@ const CreateCustomerForm = ({ onClose, onSubmit }) => {
           </button>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Design Tools Panel */}
-          <div className="lg:col-span-1 space-y-4">
+        <div className="space-y-6">
+          {/* Background and Logo Controls Row */}
+          <div className="grid lg:grid-cols-2 gap-6">
             {/* Background Section */}
             <div className="bg-white p-4 rounded-lg border">
               <h4 className="font-medium text-gray-800 mb-3 flex items-center">
@@ -692,262 +692,274 @@ const CreateCustomerForm = ({ onClose, onSubmit }) => {
                 </div>
               )}
             </div>
-
-            {/* Text Elements Section */}
-            <div className="bg-white p-4 rounded-lg border">
-              <div className="flex items-center justify-between mb-3">
-                <h4 className="font-medium text-gray-800 flex items-center">
-                  <Type className="w-4 h-4 mr-2" />
-                  Text Elements
-                </h4>
-                <button
-                  onClick={addTextElement}
-                  className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
-                >
-                  <Plus className="w-4 h-4" />
-                </button>
-              </div>
-
-              <div className="space-y-2 max-h-40 overflow-y-auto">
-                {textElements.map(element => (
-                  <div
-                    key={element.id}
-                    onClick={() => setSelectedTextId(element.id)}
-                    className={`p-2 border rounded cursor-pointer flex items-center justify-between ${
-                      selectedTextId === element.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
-                    }`}
-                  >
-                    <span className="text-sm truncate">{element.text}</span>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        deleteTextElement(element.id);
-                      }}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-
-              {/* Text Editor for Selected Element */}
-              {selectedText && (
-                <div className="mt-4 space-y-3 border-t pt-3">
-                  <input
-                    type="text"
-                    value={selectedText.text}
-                    onChange={(e) => updateTextElement(selectedText.id, { text: e.target.value })}
-                    className="w-full p-2 border rounded"
-                    placeholder="Enter text"
-                  />
-                  
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="block text-xs text-gray-600">Font Size</label>
-                      <input
-                        type="range"
-                        min="8"
-                        max="72"
-                        value={selectedText.fontSize}
-                        onChange={(e) => updateTextElement(selectedText.id, { fontSize: parseInt(e.target.value) })}
-                        className="w-full"
-                      />
-                      <span className="text-xs text-gray-500">{selectedText.fontSize}px</span>
-                    </div>
-                    
-                    <div>
-                      <label className="block text-xs text-gray-600">Font Family</label>
-                      <select
-                        value={selectedText.fontFamily}
-                        onChange={(e) => updateTextElement(selectedText.id, { fontFamily: e.target.value })}
-                        className="w-full p-1 border rounded text-xs"
-                      >
-                        <option value="Arial">Arial</option>
-                        <option value="Times New Roman">Times New Roman</option>
-                        <option value="Helvetica">Helvetica</option>
-                        <option value="Georgia">Georgia</option>
-                        <option value="Verdana">Verdana</option>
-                        <option value="Comic Sans MS">Comic Sans MS</option>
-                        <option value="Impact">Impact</option>
-                      </select>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-3 gap-2">
-                    <div>
-                      <label className="block text-xs text-gray-600">Weight</label>
-                      <select
-                        value={selectedText.fontWeight}
-                        onChange={(e) => updateTextElement(selectedText.id, { fontWeight: e.target.value })}
-                        className="w-full p-1 border rounded text-xs"
-                      >
-                        <option value="normal">Normal</option>
-                        <option value="bold">Bold</option>
-                        <option value="lighter">Lighter</option>
-                      </select>
-                    </div>
-                    
-                    <div>
-                      <label className="block text-xs text-gray-600">Style</label>
-                      <select
-                        value={selectedText.fontStyle}
-                        onChange={(e) => updateTextElement(selectedText.id, { fontStyle: e.target.value })}
-                        className="w-full p-1 border rounded text-xs"
-                      >
-                        <option value="normal">Normal</option>
-                        <option value="italic">Italic</option>
-                      </select>
-                    </div>
-                    
-                    <div>
-                      <label className="block text-xs text-gray-600">Align</label>
-                      <select
-                        value={selectedText.textAlign}
-                        onChange={(e) => updateTextElement(selectedText.id, { textAlign: e.target.value })}
-                        className="w-full p-1 border rounded text-xs"
-                      >
-                        <option value="left">Left</option>
-                        <option value="center">Center</option>
-                        <option value="right">Right</option>
-                      </select>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-xs text-gray-600">Color</label>
-                    <input
-                      type="color"
-                      value={selectedText.color}
-                      onChange={(e) => updateTextElement(selectedText.id, { color: e.target.value })}
-                      className="w-full h-8 rounded"
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="block text-xs text-gray-600">Position X</label>
-                      <input
-                        type="range"
-                        min="0"
-                        max="1"
-                        step="0.01"
-                        value={selectedText.x}
-                        onChange={(e) => updateTextElement(selectedText.id, { x: parseFloat(e.target.value) })}
-                        className="w-full"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-xs text-gray-600">Position Y</label>
-                      <input
-                        type="range"
-                        min="0"
-                        max="1"
-                        step="0.01"
-                        value={selectedText.y}
-                        onChange={(e) => updateTextElement(selectedText.id, { y: parseFloat(e.target.value) })}
-                        className="w-full"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="block text-xs text-gray-600">Rotation</label>
-                      <input
-                        type="range"
-                        min="-180"
-                        max="180"
-                        value={selectedText.rotation}
-                        onChange={(e) => updateTextElement(selectedText.id, { rotation: parseInt(e.target.value) })}
-                        className="w-full"
-                      />
-                      <span className="text-xs text-gray-500">{selectedText.rotation}°</span>
-                    </div>
-                    
-                    <div>
-                      <label className="block text-xs text-gray-600">Opacity</label>
-                      <input
-                        type="range"
-                        min="0"
-                        max="1"
-                        step="0.1"
-                        value={selectedText.opacity}
-                        onChange={(e) => updateTextElement(selectedText.id, { opacity: parseFloat(e.target.value) })}
-                        className="w-full"
-                      />
-                      <span className="text-xs text-gray-500">{Math.round(selectedText.opacity * 100)}%</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
 
           {/* Preview Panel */}
-          <div className="lg:col-span-2">
-            <div className="bg-white p-4 rounded-lg border">
-              <div className="flex items-center justify-between mb-4">
-                <h4 className="font-medium text-gray-800">Preview - {sizeConfig.name}</h4>
-                <div className="text-sm text-gray-600">
-                  {sizeConfig.widthMM} × {sizeConfig.heightMM} MM
-                </div>
-              </div>
-              
-              <div className="flex justify-center items-center bg-gray-50 p-4 rounded-lg min-h-96">
-                <div className="relative">
-                  <canvas
-                    ref={previewCanvasRef}
-                    className="border border-gray-300 rounded shadow-lg"
-                    style={{
-                      maxWidth: '100%',
-                      maxHeight: '500px',
-                      width: 'auto',
-                      height: 'auto'
-                    }}
-                  />
-                  
-                  {/* Size indicator overlay */}
-                  <div className="absolute top-2 right-2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded">
-                    {sizeConfig.name}
-                  </div>
-                  
-                  {/* Guidelines overlay for text positioning (optional) */}
-                  {selectedTextId && (
-                    <div className="absolute inset-0 pointer-events-none">
-                      {/* Add guidelines here if needed */}
-                    </div>
-                  )}
-                </div>
-              </div>
-              
-              {/* Quick Actions */}
-              <div className="flex justify-center space-x-2 mt-4">
-                <button
-                  onClick={() => {
-                    setBackgroundColor('#ffffff');
-                    setBackgroundType('color');
-                    setBackgroundPattern('solid');
-                    setCustomerLogo(null);
-                    setTextElements([]);
-                    setSelectedTextId(null);
-                  }}
-                  className="flex items-center px-3 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-                >
-                  <RotateCcw className="w-4 h-4 mr-1" />
-                  Reset
-                </button>
-                
-                <button
-                  onClick={addTextElement}
-                  className="flex items-center px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                >
-                  <Plus className="w-4 h-4 mr-1" />
-                  Add Text
-                </button>
+          <div className="bg-white p-4 rounded-lg border">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="font-medium text-gray-800">Preview - {sizeConfig.name}</h4>
+              <div className="text-sm text-gray-600">
+                {sizeConfig.widthMM} × {sizeConfig.heightMM} MM
               </div>
             </div>
+            
+            <div className="flex justify-center items-center bg-gray-50 p-4 rounded-lg min-h-96">
+              <div className="relative">
+                <canvas
+                  ref={previewCanvasRef}
+                  className="border border-gray-300 rounded shadow-lg"
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '500px',
+                    width: 'auto',
+                    height: 'auto'
+                  }}
+                />
+                
+                {/* Size indicator overlay */}
+                <div className="absolute top-2 right-2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded">
+                  {sizeConfig.name}
+                </div>
+                
+                {/* Guidelines overlay for text positioning (optional) */}
+                {selectedTextId && (
+                  <div className="absolute inset-0 pointer-events-none">
+                    {/* Add guidelines here if needed */}
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            {/* Quick Actions */}
+            <div className="flex justify-center space-x-2 mt-4">
+              <button
+                onClick={() => {
+                  setBackgroundColor('#ffffff');
+                  setBackgroundType('color');
+                  setBackgroundPattern('solid');
+                  setCustomerLogo(null);
+                  setTextElements([]);
+                  setSelectedTextId(null);
+                }}
+                className="flex items-center px-3 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+              >
+                <RotateCcw className="w-4 h-4 mr-1" />
+                Reset
+              </button>
+              
+              <button
+                onClick={addTextElement}
+                className="flex items-center px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                <Plus className="w-4 h-4 mr-1" />
+                Add Text
+              </button>
+            </div>
+          </div>
+
+          {/* Text Elements Section - Now Below Preview */}
+          <div className="bg-white p-4 rounded-lg border">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="font-medium text-gray-800 flex items-center">
+                <Type className="w-4 h-4 mr-2" />
+                Text Elements
+              </h4>
+              <button
+                onClick={addTextElement}
+                className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-2 max-h-40 overflow-y-auto mb-4">
+              {textElements.map(element => (
+                <div
+                  key={element.id}
+                  onClick={() => setSelectedTextId(element.id)}
+                  className={`p-2 border rounded cursor-pointer flex items-center justify-between ${
+                    selectedTextId === element.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+                  }`}
+                >
+                  <span className="text-sm truncate">{element.text}</span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteTextElement(element.id);
+                    }}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {/* Text Editor for Selected Element */}
+            {selectedText && (
+              <div className="border-t pt-4">
+                <h5 className="font-medium text-gray-700 mb-3">Edit Selected Text</h5>
+                <div className="grid lg:grid-cols-2 gap-4">
+                  {/* Left Column - Basic Text Properties */}
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Text Content</label>
+                      <input
+                        type="text"
+                        value={selectedText.text}
+                        onChange={(e) => updateTextElement(selectedText.id, { text: e.target.value })}
+                        className="w-full p-2 border rounded"
+                        placeholder="Enter text"
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-xs text-gray-600">Font Size</label>
+                        <input
+                          type="range"
+                          min="8"
+                          max="72"
+                          value={selectedText.fontSize}
+                          onChange={(e) => updateTextElement(selectedText.id, { fontSize: parseInt(e.target.value) })}
+                          className="w-full"
+                        />
+                        <span className="text-xs text-gray-500">{selectedText.fontSize}px</span>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-xs text-gray-600">Font Family</label>
+                        <select
+                          value={selectedText.fontFamily}
+                          onChange={(e) => updateTextElement(selectedText.id, { fontFamily: e.target.value })}
+                          className="w-full p-1 border rounded text-xs"
+                        >
+                          <option value="Arial">Arial</option>
+                          <option value="Times New Roman">Times New Roman</option>
+                          <option value="Helvetica">Helvetica</option>
+                          <option value="Georgia">Georgia</option>
+                          <option value="Verdana">Verdana</option>
+                          <option value="Comic Sans MS">Comic Sans MS</option>
+                          <option value="Impact">Impact</option>
+                        </select>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-3 gap-2">
+                      <div>
+                        <label className="block text-xs text-gray-600">Weight</label>
+                        <select
+                          value={selectedText.fontWeight}
+                          onChange={(e) => updateTextElement(selectedText.id, { fontWeight: e.target.value })}
+                          className="w-full p-1 border rounded text-xs"
+                        >
+                          <option value="normal">Normal</option>
+                          <option value="bold">Bold</option>
+                          <option value="lighter">Lighter</option>
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-xs text-gray-600">Style</label>
+                        <select
+                          value={selectedText.fontStyle}
+                          onChange={(e) => updateTextElement(selectedText.id, { fontStyle: e.target.value })}
+                          className="w-full p-1 border rounded text-xs"
+                        >
+                          <option value="normal">Normal</option>
+                          <option value="italic">Italic</option>
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-xs text-gray-600">Align</label>
+                        <select
+                          value={selectedText.textAlign}
+                          onChange={(e) => updateTextElement(selectedText.id, { textAlign: e.target.value })}
+                          className="w-full p-1 border rounded text-xs"
+                        >
+                          <option value="left">Left</option>
+                          <option value="center">Center</option>
+                          <option value="right">Right</option>
+                        </select>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">Color</label>
+                      <input
+                        type="color"
+                        value={selectedText.color}
+                        onChange={(e) => updateTextElement(selectedText.id, { color: e.target.value })}
+                        className="w-full h-8 rounded"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Right Column - Position and Transform */}
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-xs text-gray-600">Position X</label>
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.01"
+                          value={selectedText.x}
+                          onChange={(e) => updateTextElement(selectedText.id, { x: parseFloat(e.target.value) })}
+                          className="w-full"
+                        />
+                        <span className="text-xs text-gray-500">{Math.round(selectedText.x * 100)}%</span>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-xs text-gray-600">Position Y</label>
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.01"
+                          value={selectedText.y}
+                          onChange={(e) => updateTextElement(selectedText.id, { y: parseFloat(e.target.value) })}
+                          className="w-full"
+                        />
+                        <span className="text-xs text-gray-500">{Math.round(selectedText.y * 100)}%</span>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-xs text-gray-600">Rotation</label>
+                        <input
+                          type="range"
+                          min="-180"
+                          max="180"
+                          value={selectedText.rotation}
+                          onChange={(e) => updateTextElement(selectedText.id, { rotation: parseInt(e.target.value) })}
+                          className="w-full"
+                        />
+                        <span className="text-xs text-gray-500">{selectedText.rotation}°</span>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-xs text-gray-600">Opacity</label>
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.1"
+                          value={selectedText.opacity}
+                          onChange={(e) => updateTextElement(selectedText.id, { opacity: parseFloat(e.target.value) })}
+                          className="w-full"
+                        />
+                        <span className="text-xs text-gray-500">{Math.round(selectedText.opacity * 100)}%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
