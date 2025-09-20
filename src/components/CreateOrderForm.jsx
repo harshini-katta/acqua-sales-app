@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { fastapi_url } from '../App';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
+import ApiService from '../utils/apiService';
 
 const formatOdooDate = (date) => {
   const year = date.getFullYear();
@@ -20,47 +19,140 @@ const CreateOrderForm = ({ onClose, onSubmit, reloadData }) => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedCap, setSelectedCap] = useState('');
-  const [loading, setLoading] = useState(false);
+  
+  const [loadingState, setLoadingState] = useState({
+    customers: false,
+    products: false,
+    order: false,
+    initialLoad: false
+  });
+  
+  const [errors, setErrors] = useState({
+    customers: null,
+    products: null,
+    order: null
+  });
 
-  // Fetch customers
-  const fetchCustomers = async () => {
-    try {
-      const res = await axios.get(
-        fastapi_url+'/fastapi/odoo/contacts/external-contacts'
-      );
-      setCustomers(Array.isArray(res.data) ? res.data : []);
-    } catch (err) {
-      console.error('Error fetching customers:', err.message);
-      setCustomers([]);
+  // Use refs to prevent duplicate calls and handle cleanup
+  const abortControllerRef = useRef(null);
+  const isLoadingRef = useRef(false);
+
+  // Enhanced batch load data with proper cleanup
+  const loadData = useCallback(async () => {
+    // Prevent duplicate calls
+    if (isLoadingRef.current) {
+      console.log('Data loading already in progress, skipping...');
+      return;
     }
-  };
 
-  // Fetch products
-  const fetchProducts = async () => {
+    // Abort any previous request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    isLoadingRef.current = true;
+    abortControllerRef.current = new AbortController();
+    
+    setLoadingState(prev => ({ ...prev, initialLoad: true }));
+    console.log('Starting batch data loading...');
+    
     try {
-      const res = await axios.get(
-        fastapi_url+'/fastapi/odoo/products'
-      );
-      if (Array.isArray(res.data.products)) {
-        // Simulate sizes and cap_types if not present
-        const formattedProducts = res.data.products.map((p) => ({
+      const { results, errors: batchErrors } = await ApiService.batchLoad([
+        {
+          key: 'customers',
+          operation: () => ApiService.getCustomers(true),
+          delay: 300 // 300ms delay between operations
+        },
+        {
+          key: 'products', 
+          operation: () => ApiService.getProducts(0, 100, false), // forceRefresh = false for caching
+          delay: 0 // No delay after last operation
+        }
+      ], abortControllerRef.current);
+
+      // Check if operation was aborted
+      if (abortControllerRef.current?.signal.aborted) {
+        console.log('Data loading was aborted');
+        return;
+      }
+
+      // Process customers
+      if (results.customers) {
+        const customerData = Array.isArray(results.customers.data) ? results.customers.data : [];
+        setCustomers(customerData);
+        console.log(`Loaded ${customerData.length} customers`);
+      }
+
+      // Process products
+      if (results.products) {
+        const productsData = results.products.data.products || [];
+        const formattedProducts = productsData.map((p) => ({
           ...p,
-          price: p.list_price,
-          sizes: ['250ml', '500ml', '1000ml'], // example
-          cap_types: ['fliptop', 'screwcap', 'sportscap'], // example
+          price: p.list_price || p.price,
+          sizes: p.sizes || ['250ml', '500ml', '1000ml'],
+          cap_types: p.cap_types || ['fliptop', 'screwcap', 'sportscap'],
         }));
         setProducts(formattedProducts);
+        console.log(`Loaded ${formattedProducts.length} products`);
       }
-    } catch (err) {
-      console.error('Error fetching products:', err.message);
-      setProducts([]);
-    }
-  };
 
+      // Handle any errors
+      const errorMessages = {};
+      if (batchErrors.customers) {
+        errorMessages.customers = ApiService.getErrorMessage(batchErrors.customers);
+        setCustomers([]);
+      }
+      if (batchErrors.products) {
+        errorMessages.products = ApiService.getErrorMessage(batchErrors.products);
+        setProducts([]);
+      }
+      
+      setErrors(errorMessages);
+      console.log('Batch loading completed');
+      
+    } catch (error) {
+      if (error.name === 'AbortError') {
+        console.log('Data loading was aborted');
+        return;
+      }
+      console.error('Batch loading failed:', error);
+      setErrors({
+        customers: 'Failed to load data',
+        products: 'Failed to load data',
+        order: null
+      });
+    } finally {
+      setLoadingState(prev => ({ ...prev, initialLoad: false }));
+      isLoadingRef.current = false;
+      abortControllerRef.current = null;
+    }
+  }, []);
+
+  // Load data on component mount and when reloadData changes
   useEffect(() => {
-    fetchCustomers();
-    fetchProducts();
-  }, [reloadData]);
+    loadData();
+    
+    // Cleanup function to abort requests when component unmounts
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      isLoadingRef.current = false;
+    };
+  }, [loadData, reloadData]);
+
+  // Retry failed data loading
+  const retryFailedData = () => {
+    // Reset loading state first
+    isLoadingRef.current = false;
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    
+    // Clear errors and retry
+    setErrors({ customers: null, products: null, order: null });
+    loadData();
+  };
 
   const addProduct = () => {
     if (!selectedProduct) return;
@@ -127,36 +219,94 @@ const CreateOrderForm = ({ onClose, onSubmit, reloadData }) => {
     }));
 
     const date_order = formatOdooDate(new Date());
+    const orderData = { partner_id: customer.id, date_order, order_line };
+    
+    setLoadingState(prev => ({ ...prev, order: true }));
+    setErrors(prev => ({ ...prev, order: null }));
 
     try {
-      setLoading(true);
-      const response = await axios.post(
-        fastapi_url+'/fastapi/odoo/orders',
-        { partner_id: customer.id, date_order, order_line },
-        { headers: { 'Content-Type': 'application/json' } }
-      );
-       //alert('Order created successfully!');
-      onSubmit({ customer: selectedCustomer, items: orderItems, total, apiResponse: response.data });
+      console.log('Creating order...');
+      const response = await ApiService.createOrder(orderData);
+      
+      console.log('Order created successfully:', response.data);
+      onSubmit({ 
+        customer: selectedCustomer, 
+        items: orderItems, 
+        total, 
+        apiResponse: response.data 
+      });
       onClose();
-    } catch (err) {
-      console.error('Error creating order:', err.response || err.message);
-      alert('Failed to create order.');
+      
+    } catch (error) {
+      const errorMessage = ApiService.getErrorMessage(error);
+      console.error('Error creating order:', error);
+      setErrors(prev => ({ ...prev, order: errorMessage }));
+      alert(`Failed to create order: ${errorMessage}`);
     } finally {
-      setLoading(false);
+      setLoadingState(prev => ({ ...prev, order: false }));
     }
   };
 
+  // Loading state check
+  const isLoading = loadingState.initialLoad || loadingState.customers || loadingState.products;
+  const hasErrors = errors.customers || errors.products;
+
   return (
     <div className="space-y-6">
-      {/* Customers */}
+      {/* Overall loading indicator */}
+      {loadingState.initialLoad && (
+        <div className="text-center py-4">
+          <div className="inline-flex items-center px-4 py-2 bg-blue-50 text-blue-700 rounded-lg">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-700 mr-2"></div>
+            Loading order form data...
+          </div>
+        </div>
+      )}
+
+      {/* Error messages and retry buttons */}
+      {hasErrors && !loadingState.initialLoad && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-red-800 font-medium">Data Loading Error</h3>
+              {errors.customers && (
+                <p className="text-red-600 text-sm mt-1">Customers: {errors.customers}</p>
+              )}
+              {errors.products && (
+                <p className="text-red-600 text-sm mt-1">Products: {errors.products}</p>
+              )}
+            </div>
+            <button
+              onClick={retryFailedData}
+              className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 disabled:opacity-50"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Retrying...' : 'Retry'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Customers dropdown */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Select Customer</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Select Customer
+          {loadingState.customers && <span className="text-blue-600 ml-2">(Loading...)</span>}
+        </label>
         <select
           value={selectedCustomer}
           onChange={(e) => setSelectedCustomer(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+          disabled={loadingState.customers || customers.length === 0}
         >
-          <option value="">Choose a customer...</option>
+          <option value="">
+            {loadingState.customers 
+              ? 'Loading customers...' 
+              : customers.length === 0 
+                ? errors.customers ? 'Failed to load customers' : 'No customers available'
+                : 'Choose a customer...'
+            }
+          </option>
           {customers.map((c) => (
             <option key={c.id} value={c.name}>
               {c.name} - {c.phone || 'No phone'}
@@ -165,9 +315,12 @@ const CreateOrderForm = ({ onClose, onSubmit, reloadData }) => {
         </select>
       </div>
 
-      {/* Products */}
+      {/* Products dropdown */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Select Product</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Select Product
+          {loadingState.products && <span className="text-blue-600 ml-2">(Loading...)</span>}
+        </label>
         <select
           value={selectedProduct ? selectedProduct.id : ''}
           onChange={(e) => {
@@ -176,9 +329,17 @@ const CreateOrderForm = ({ onClose, onSubmit, reloadData }) => {
             setSelectedSize('');
             setSelectedCap('');
           }}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+          disabled={loadingState.products || products.length === 0}
         >
-          <option value="">Choose a product...</option>
+          <option value="">
+            {loadingState.products 
+              ? 'Loading products...' 
+              : products.length === 0 
+                ? errors.products ? 'Failed to load products' : 'No products available'
+                : 'Choose a product...'
+            }
+          </option>
           {products.map((p) => (
             <option key={p.id} value={p.id}>
               {p.name} - ₹{p.price}
@@ -187,7 +348,7 @@ const CreateOrderForm = ({ onClose, onSubmit, reloadData }) => {
         </select>
       </div>
 
-      {/* Size */}
+      {/* Size selection */}
       {selectedProduct && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Select Size</label>
@@ -204,7 +365,7 @@ const CreateOrderForm = ({ onClose, onSubmit, reloadData }) => {
         </div>
       )}
 
-      {/* Cap Type */}
+      {/* Cap Type selection */}
       {selectedProduct && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Select Cap Type</label>
@@ -226,19 +387,19 @@ const CreateOrderForm = ({ onClose, onSubmit, reloadData }) => {
         <button
           type="button"
           onClick={addProduct}
-          className="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600"
+          className="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition-colors"
         >
           Add Product
         </button>
       )}
 
-      {/* Order Items */}
+      {/* Order Items display */}
       {orderItems.length > 0 && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Order Items</label>
           <div className="space-y-2">
             {orderItems.map((item) => (
-              <div key={item.id} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+              <div key={`${item.id}-${item.selectedSize}-${item.selectedCap}`} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
                 <div>
                   <span className="font-medium">{item.name}</span>
                   <span className="text-gray-600 ml-2">₹{item.price}</span>
@@ -250,15 +411,15 @@ const CreateOrderForm = ({ onClose, onSubmit, reloadData }) => {
                   <button
                     type="button"
                     onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                    className="bg-red-500 text-white w-6 h-6 rounded text-sm hover:bg-red-600"
+                    className="bg-red-500 text-white w-6 h-6 rounded text-sm hover:bg-red-600 transition-colors"
                   >
                     -
                   </button>
-                  <span className="w-8 text-center">{item.quantity}</span>
+                  <span className="w-8 text-center font-medium">{item.quantity}</span>
                   <button
                     type="button"
                     onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                    className="bg-green-500 text-white w-6 h-6 rounded text-sm hover:bg-green-600"
+                    className="bg-green-500 text-white w-6 h-6 rounded text-sm hover:bg-green-600 transition-colors"
                   >
                     +
                   </button>
@@ -272,23 +433,44 @@ const CreateOrderForm = ({ onClose, onSubmit, reloadData }) => {
         </div>
       )}
 
-      {/* Buttons */}
+      {/* Order creation error */}
+      {errors.order && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+          <p className="text-red-600 text-sm">Order Creation Error: {errors.order}</p>
+        </div>
+      )}
+
+      {/* Action buttons */}
       <div className="flex space-x-3">
         <button
           type="button"
           onClick={onClose}
-          className="flex-1 bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600"
-          disabled={loading}
+          className="flex-1 bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50"
+          disabled={loadingState.order}
         >
           Cancel
         </button>
         <button
           type="button"
           onClick={handleSubmit}
-          className="flex-1 bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600"
-          disabled={loading}
+          className="flex-1 bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
+          disabled={
+            loadingState.order || 
+            customers.length === 0 || 
+            products.length === 0 || 
+            !selectedCustomer || 
+            orderItems.length === 0 ||
+            hasErrors
+          }
         >
-          {loading ? 'Creating...' : 'Create Order'}
+          {loadingState.order ? (
+            <span className="inline-flex items-center">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+              Creating...
+            </span>
+          ) : (
+            'Create Order'
+          )}
         </button>
       </div>
     </div>
