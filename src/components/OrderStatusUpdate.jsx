@@ -75,14 +75,14 @@ const OrderStatusUpdate = ({ orderId, onClose, onSubmit }) => {
       description: 'Order confirmed and being processed'
     },
     {
-      value: 'shipped',
+      value: 'sent',
       label: 'Shipped',
       icon: Truck,
       color: 'orange',
       description: 'Order shipped and in transit'
     },
     {
-      value: 'delivered',
+      value: 'done',
       label: 'Delivered',
       icon: CheckCircle,
       color: 'green',
@@ -102,7 +102,7 @@ const OrderStatusUpdate = ({ orderId, onClose, onSubmit }) => {
       const timestamp = new Date().toLocaleString();
       const updateData = {
         status: newStatus,
-        delivery_note: `${timestamp} - ${deliveryNote}`,
+        delivery_notes: `${timestamp} - ${deliveryNote}`,
         estimated_delivery: estimatedDelivery || null
       };
 
