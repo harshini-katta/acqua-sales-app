@@ -19,7 +19,8 @@ const BackofficeDashboard = ({ user, onLogout }) => {
   const handleOrderUpdate = async (orderData) => {
     try {
       // API call to update order status and add delivery notes
-     const response = await fetch(`${fastapi_url}/fastapi/odoo/orders/${selectedOrder}/status`, {
+     const response = await fetch(`${fastapi_url}/fastapi/odoo/order-management/orders/${selectedOrder}/status`, {
+      
   method: 'PUT',
   headers: {
     'Content-Type': 'application/json',
