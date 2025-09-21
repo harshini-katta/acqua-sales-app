@@ -2,18 +2,24 @@ import React, { useEffect, useState } from 'react';
 import { Search } from 'lucide-react';
 import { fastapi_url } from '../App';
 
-const OrdersList = () => {
+const OrdersList = ({ userEmail, refreshTrigger }) => { // refreshTrigger can be a counter
   const [orders, setOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
 
-  useEffect(() => {
-    fetch(fastapi_url+'/fastapi/odoo/orders')
+  const fetchOrders = () => {
+    if (!userEmail) return;
+
+    fetch(`${fastapi_url}/fastapi/odoo/order-management/orders/sales/orders/${encodeURIComponent(userEmail)}`)
       .then((res) => res.json())
       .then((data) => {
         setOrders(data.orders || []);
       })
       .catch((err) => console.error('Error fetching orders:', err));
-  }, []);
+  };
+
+  useEffect(() => {
+    fetchOrders();
+  }, [userEmail, refreshTrigger]); // refreshTrigger allows re-fetch after order creation
 
   const filteredOrders = orders.filter((order) =>
     order.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
