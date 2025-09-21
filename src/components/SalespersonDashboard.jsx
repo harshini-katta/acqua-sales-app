@@ -17,14 +17,21 @@ const SalespersonDashboard = ({ user, onLogout }) => {
   const [revenue, setRevenue] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  // Fetch total orders and revenue from backend
+  // 🔹 Orders refresh counter
+  const [orderRefreshCounter, setOrderRefreshCounter] = useState(0);
+
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await axios.get(fastapi_url+'/fastapi/odoo/order-management/orders/customer/revenue');
+        if (!user?.email) return;
+
+        const response = await axios.get(
+          `${fastapi_url}/fastapi/odoo/order-management/orders/sales/revenue/${user.email}`
+        );
+
         if (response.data) {
           setTotalOrders(response.data.total_orders || 0);
-          setRevenue(response.data.revenue || 0);
+          setRevenue(response.data.total_revenue || 0);
         }
       } catch (error) {
         console.error('Error fetching dashboard stats:', error);
@@ -34,11 +41,14 @@ const SalespersonDashboard = ({ user, onLogout }) => {
     };
 
     fetchStats();
-  }, []);
+  }, [user?.email, orderRefreshCounter]); // optional: refresh stats when a new order is added
 
   const handleCreateOrder = (orderData) => {
     console.log('Creating order:', orderData);
     alert('Order created successfully!');
+
+    // 🔹 Increment the counter to refresh OrdersList
+    setOrderRefreshCounter(prev => prev + 1);
   };
 
   const handleCreateCustomer = (customerData) => {
@@ -49,15 +59,13 @@ const SalespersonDashboard = ({ user, onLogout }) => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header user={user} onLogout={onLogout} />
-      
+
       <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold mb-4">Distributor Dashboard</h1>
-            <p className="text-xl text-blue-100">
-              Manage orders and customers for premium bottled water products
-            </p>
-          </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-4xl font-bold mb-4">Distributor Dashboard</h1>
+          <p className="text-xl text-blue-100">
+            Manage orders and customers for premium bottled water products
+          </p>
         </div>
       </div>
 
@@ -115,9 +123,7 @@ const SalespersonDashboard = ({ user, onLogout }) => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Orders</p>
-                <p className="text-3xl font-bold text-gray-900">
-                  {loading ? '...' : totalOrders}
-                </p>
+                <p className="text-3xl font-bold text-gray-900">{loading ? '...' : totalOrders}</p>
               </div>
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                 <ShoppingCart className="w-6 h-6 text-blue-600" />
@@ -141,9 +147,7 @@ const SalespersonDashboard = ({ user, onLogout }) => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Revenue</p>
-                <p className="text-3xl font-bold text-gray-900">
-                  {loading ? '...' : `₹${revenue}`}
-                </p>
+                <p className="text-3xl font-bold text-gray-900">{loading ? '...' : `₹${revenue}`}</p>
               </div>
               <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
                 <TrendingUp className="w-6 h-6 text-orange-600" />
@@ -167,7 +171,11 @@ const SalespersonDashboard = ({ user, onLogout }) => {
         onClose={() => setActiveModal(null)}
         title="Orders"
       >
-        <OrdersList />
+        {/* Pass userEmail and refreshTrigger to OrdersList */}
+        <OrdersList 
+          userEmail={user.email} 
+          refreshTrigger={orderRefreshCounter} 
+        />
       </Modal>
 
       <Modal
