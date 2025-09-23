@@ -249,6 +249,8 @@ const CreateCustomerForm = ({ onClose, onSubmit }) => {
     zip: ''
   });
 
+  // const [loading, setLoading] = useState(false);
+
   const businessCategories = [
     { id: 'textile', name: 'Textile/Clothing Shop', icon: '👕' },
     { id: 'automobile', name: 'Automobile', icon: '🚗' },

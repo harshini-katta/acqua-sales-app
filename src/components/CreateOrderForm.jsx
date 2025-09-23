@@ -182,6 +182,61 @@ const CreateOrderForm = ({ onClose, onSubmit, reloadData }) => {
     setSelectedCap('');
   };
 
+  // Fetch products
+  const fetchProducts = async () => {
+    try {
+      const res = await axios.get(
+        fastapi_url+'/fastapi/odoo/products'
+      );
+      if (Array.isArray(res.data.products)) {
+        // Simulate sizes and cap_types if not present
+        const formattedProducts = res.data.products.map((p) => ({
+          ...p,
+          price: p.list_price,
+          sizes: ['250ml', '500ml', '1000ml'], // example
+          cap_types: ['fliptop', 'screwcap', 'sportscap'], // example
+        }));
+        setProducts(formattedProducts);
+      }
+    } catch (err) {
+      console.error('Error fetching products:', err.message);
+      setProducts([]);
+    }
+  };
+
+  useEffect(() => {
+    fetchCustomers();
+    fetchProducts();
+  }, [reloadData]);
+
+  const addProduct = () => {
+    if (!selectedProduct) return;
+    const existing = orderItems.find((item) => item.id === selectedProduct.id);
+    if (existing) {
+      setOrderItems(
+        orderItems.map((item) =>
+          item.id === selectedProduct.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        )
+      );
+    } else {
+      setOrderItems([
+        ...orderItems,
+        {
+          ...selectedProduct,
+          quantity: 1,
+          selectedSize,
+          selectedCap,
+        },
+      ]);
+    }
+    // Reset selections
+    setSelectedProduct(null);
+    setSelectedSize('');
+    setSelectedCap('');
+  };
+
   const updateQuantity = (id, quantity) => {
     if (quantity <= 0) {
       setOrderItems(orderItems.filter((item) => item.id !== id));

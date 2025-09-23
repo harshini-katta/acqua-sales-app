@@ -75,7 +75,7 @@ const OrderStatusUpdate = ({ orderId, onClose, onSubmit }) => {
       description: 'Order confirmed and being processed'
     },
     {
-      value: 'sent',
+      value: 'shipped',
       label: 'Shipped',
       icon: Truck,
       color: 'orange',
